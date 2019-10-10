@@ -33,3 +33,84 @@ Use the State pattern in either of the following cases
 ## Credits
 
 * [Design Patterns: Elements of Reusable Object-Oriented Software](http://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612)
+
+```java
+public interface State {
+
+  void onEnterState();
+
+  void observe();
+
+}
+```
+
+
+```java
+public class AngryState implements State {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AngryState.class);
+
+  private Mammoth mammoth;
+
+  public AngryState(Mammoth mammoth) {
+    this.mammoth = mammoth;
+  }
+
+  @Override
+  public void observe() {
+    LOGGER.info("{} is furious!", mammoth);
+  }
+
+  @Override
+  public void onEnterState() {
+    LOGGER.info("{} gets angry!", mammoth);
+  }
+
+}
+```
+
+
+```java
+public class Mammoth {
+
+  private State state;
+
+  public Mammoth() {
+    state = new PeacefulState(this);
+  }
+
+  /**
+   * Makes time pass for the mammoth
+   */
+  public void timePasses() {
+    if (state.getClass().equals(PeacefulState.class)) {
+      changeStateTo(new AngryState(this));
+    } else {
+      changeStateTo(new PeacefulState(this));
+    }
+  }
+
+  private void changeStateTo(State newState) {
+    this.state = newState;
+    this.state.onEnterState();
+  }
+
+  @Override
+  public String toString() {
+    return "The mammoth";
+  }
+
+  public void observe() {
+    this.state.observe();
+  }
+}
+```
+
+```java
+Mammoth mammoth = new Mammoth();
+mammoth.observe();
+mammoth.timePasses();
+mammoth.observe();
+mammoth.timePasses();
+mammoth.observe();
+```
